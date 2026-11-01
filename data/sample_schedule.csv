@@ -1,0 +1,11 @@
+Task ID,Task Name,Duration (days),Start Date,End Date,% Complete,Cost ($),Work (hrs),Status
+T01,Demolition,10,2026-01-05,2026-01-18,100,45000,320,Complete
+T02,Site Preparation,7,2026-01-19,2026-01-27,100,30000,160,Complete
+T03,Foundation & Slab,14,2026-01-28,2026-02-14,100,85000,480,Complete
+T04,Structural steel installed,21,2026-02-03,2026-02-28,90,120000,560,At Risk
+T05,HVAC rough-in,30,2026-02-17,2026-04-08,35,70000,420,At Risk
+T06,Electrical rough-in,25,2026-02-24,2026-04-02,20,55000,380,On Track
+T07,Plumbing rough-in,20,2026-03-02,2026-03-28,15,48000,320,On Track
+T08,Ceiling grid installation,15,2026-03-15,2026-04-03,0,35000,240,Delayed
+T09,Drywall & insulation,20,2026-03-22,2026-04-17,0,62000,400,Delayed
+T10,Finishes & fit-out,30,2026-04-07,2026-05-20,0,90000,480,Not Started

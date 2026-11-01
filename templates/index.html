@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>F3 Status Report Generator | PM Co-pilot</title>
+  <link rel="stylesheet" href="/static/css/style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+</head>
+<body>
+  <!-- ── Header ─────────────────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-badge">F3</span>
+        <div>
+          <div class="logo-title">Status Report Generator</div>
+          <div class="logo-sub">PM Co-pilot · ISAN 5365</div>
+        </div>
+      </div>
+      <div class="header-meta">
+        <span class="mode-badge {% if use_real_ai %}mode-ai{% else %}mode-demo{% endif %}">
+          {% if use_real_ai %}🤖 AI Mode{% else %}🎭 Demo Mode{% endif %}
+        </span>
+        <span class="header-author">Sneha Nitnaware</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Main Layout ────────────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- Step Indicator -->
+    <div class="steps-bar">
+      <div class="step active" id="step-1-indicator">
+        <span class="step-num">1</span>
+        <span class="step-label">Input</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" id="step-2-indicator">
+        <span class="step-num">2</span>
+        <span class="step-label">Review</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" id="step-3-indicator">
+        <span class="step-num">3</span>
+        <span class="step-label">Report</span>
+      </div>
+    </div>
+
+    <!-- ── STEP 1: Input Form ────────────────────────────────────────── -->
+    <section id="step-1" class="card step-section active">
+      <div class="card-header">
+        <h2>📋 Project Status Input</h2>
+        <p class="card-desc">Fill in your project details. Fields marked <span class="req">*</span> are required. Leave others blank and F3 will insert <code>[CONFIRM]</code> placeholders.</p>
+      </div>
+
+      <form id="input-form" novalidate>
+        <!-- Row 1 -->
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Project Name <span class="req">*</span></label>
+            <input type="text" id="project_name" placeholder="e.g. Harmon Corp Fit-Out" required/>
+          </div>
+          <div class="form-group">
+            <label>Reporting Period <span class="req">*</span></label>
+            <input type="text" id="reporting_period" placeholder="e.g. Week ending 11 Apr 2026" required/>
+          </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Prepared By</label>
+            <input type="text" id="prepared_by" placeholder="Your name or team"/>
+          </div>
+          <div class="form-group">
+            <label>Audience <span class="req">*</span></label>
+            <div class="audience-selector">
+              <label class="audience-card selected" data-value="executive">
+                <input type="radio" name="audience" value="executive" checked/>
+                <span class="aud-icon">👔</span>
+                <span class="aud-name">Executive</span>
+                <span class="aud-desc">≤300 words, strategic</span>
+              </label>
+              <label class="audience-card" data-value="client">
+                <input type="radio" name="audience" value="client"/>
+                <span class="aud-icon">🤝</span>
+                <span class="aud-name">Client</span>
+                <span class="aud-desc">Plain language, safe</span>
+              </label>
+              <label class="audience-card" data-value="site_team">
+                <input type="radio" name="audience" value="site_team"/>
+                <span class="aud-icon">🏗️</span>
+                <span class="aud-name">Site Team</span>
+                <span class="aud-desc">Dates, data, actions</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Milestones -->
+        <div class="form-group">
+          <label>Milestones / Progress This Period <span class="req">*</span></label>
+          <textarea id="milestones" rows="4" placeholder="e.g. Demolition complete. Structural steel at 90%. HVAC rough-in started at 35%..."></textarea>
+        </div>
+
+        <!-- Blockers -->
+        <div class="form-group">
+          <label>Blockers &amp; Risks</label>
+          <textarea id="blockers_risks" rows="3" placeholder="e.g. Steel delivery delayed 10 days due to supplier issue. HVAC dependent on steel..."></textarea>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Budget Status</label>
+            <input type="text" id="budget_status" placeholder="e.g. On track – $230k of $465k spent"/>
+          </div>
+          <div class="form-group">
+            <label>Key Decisions Made / Pending</label>
+            <input type="text" id="key_decisions" placeholder="e.g. Expedite steel approved. Ceiling grid TBD."/>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group">
+          <label>Additional Notes</label>
+          <textarea id="notes" rows="2" placeholder="Any other context for F3..."></textarea>
+        </div>
+
+        <!-- CSV Upload -->
+        <div class="csv-section">
+          <div class="csv-header">
+            <h3>📊 Schedule CSV (Optional but Recommended)</h3>
+            <p>Upload your project schedule CSV to enable data-grounded reporting with real dates, % complete, and risk status.</p>
+          </div>
+          <div class="csv-controls">
+            <label class="btn btn-secondary" for="csv-upload">
+              📁 Upload CSV
+              <input type="file" id="csv-upload" accept=".csv" style="display:none"/>
+            </label>
+            <button type="button" class="btn btn-ghost" id="load-sample-csv">Load Sample CSV</button>
+            <button type="button" class="btn btn-ghost" id="clear-csv" style="display:none">Clear CSV</button>
+          </div>
+          <div id="csv-preview" class="csv-preview" style="display:none"></div>
+          <textarea id="csv-content" style="display:none"></textarea>
+        </div>
+
+        <!-- Submit -->
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="analyze-btn">
+            <span class="btn-text">🔍 Analyze &amp; Preview Report</span>
+            <span class="btn-loading" style="display:none">Analyzing…</span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ── STEP 2: THOUGHT PROCESS + Approval Gate ───────────────────── -->
+    <section id="step-2" class="card step-section" style="display:none">
+      <div class="card-header">
+        <h2>🧠 F3 Thought Process &amp; Approval Gate</h2>
+        <p class="card-desc">Review F3's reasoning and data sources before generating the report.</p>
+      </div>
+
+      <!-- Thought Process Block -->
+      <div class="thought-process-block" id="thought-process-block">
+        <div class="tp-label">THOUGHT PROCESS</div>
+        <div class="tp-grid">
+          <div class="tp-item">
+            <span class="tp-key">User Intent</span>
+            <span class="tp-val" id="tp-intent">—</span>
+          </div>
+          <div class="tp-item">
+            <span class="tp-key">Retrieval Strategy</span>
+            <ul class="tp-val tp-list" id="tp-retrieval"></ul>
+          </div>
+          <div class="tp-item">
+            <span class="tp-key">Confidence</span>
+            <div class="tp-val">
+              <span class="confidence-badge" id="tp-confidence-badge">—</span>
+              <span id="tp-confidence-reason" class="tp-reason">—</span>
+            </div>
+          </div>
+          <div class="tp-item">
+            <span class="tp-key">Scope Boundaries</span>
+            <ul class="tp-val tp-list" id="tp-scope"></ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Schedule Summary (if CSV provided) -->
+      <div id="schedule-summary-block" class="schedule-summary" style="display:none">
+        <h3>📊 Schedule Data Summary</h3>
+        <div class="sched-grid" id="sched-grid"></div>
+      </div>
+
+      <!-- Approval Gate -->
+      <div class="approval-gate" id="approval-gate-block">
+        <div class="gate-header">
+          <span class="gate-icon">🚦</span>
+          <h3>Human-in-the-Loop Approval Gate</h3>
+        </div>
+        <div class="gate-body">
+          <div class="gate-row">
+            <span class="gate-label">Report Type</span>
+            <span class="gate-val" id="gate-type">—</span>
+          </div>
+          <div class="gate-row">
+            <span class="gate-label">Project</span>
+            <span class="gate-val" id="gate-project">—</span>
+          </div>
+          <div class="gate-row">
+            <span class="gate-label">Period</span>
+            <span class="gate-val" id="gate-period">—</span>
+          </div>
+          <div class="gate-row">
+            <span class="gate-label">Will Generate</span>
+            <span class="gate-val" id="gate-will-generate">—</span>
+          </div>
+          <div class="gate-row">
+            <span class="gate-label">Confidence</span>
+            <span class="gate-val" id="gate-confidence">—</span>
+          </div>
+          <div class="gate-row gaps-row" id="gaps-row" style="display:none">
+            <span class="gate-label">⚠️ Key Gaps</span>
+            <span class="gate-val" id="gate-gaps">—</span>
+          </div>
+        </div>
+        <p class="gate-prompt">Reply <strong>GO</strong> to generate the report, or <strong>NO-GO</strong> to revise your inputs.</p>
+        <div class="gate-actions">
+          <button class="btn btn-go" id="btn-go">✅ GO – Generate Report</button>
+          <button class="btn btn-nogo" id="btn-nogo">❌ NO-GO – Revise Inputs</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── STEP 3: Report Output ─────────────────────────────────────── -->
+    <section id="step-3" class="card step-section" style="display:none">
+      <div class="card-header">
+        <div class="report-meta-bar">
+          <div>
+            <h2>📄 Generated Report</h2>
+            <p class="card-desc" id="report-meta-desc">—</p>
+          </div>
+          <div class="report-actions">
+            <button class="btn btn-secondary" id="btn-copy">📋 Copy</button>
+            <button class="btn btn-secondary" id="btn-download">⬇️ Download</button>
+            <button class="btn btn-ghost" id="btn-new">+ New Report</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode banner -->
+      <div class="mode-banner {% if use_real_ai %}mode-banner-ai{% else %}mode-banner-demo{% endif %}">
+        {% if use_real_ai %}
+          🤖 <strong>AI Mode:</strong> Generated by Claude AI using your inputs and PMO knowledge base.
+        {% else %}
+          🎭 <strong>Demo Mode:</strong> Generated using rule-based engine. Add your Anthropic API key in <code>.env</code> to enable AI generation.
+        {% endif %}
+      </div>
+
+      <!-- Report Content -->
+      <div class="report-output" id="report-output">
+        <div class="report-body" id="report-body"></div>
+      </div>
+
+      <!-- Confirm checker -->
+      <div class="confirm-checker" id="confirm-checker" style="display:none">
+        <h4>🔔 [CONFIRM] Items Found</h4>
+        <p>The following items need your verification before sending this report:</p>
+        <ul id="confirm-list"></ul>
+      </div>
+
+      <!-- New report nudge -->
+      <div class="next-steps">
+        <p>✅ Report ready. Review all <code>[CONFIRM]</code> items before sending.</p>
+        <button class="btn btn-primary" id="btn-generate-another">Generate Another Audience</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────────────────────── -->
+  <footer class="footer">
+    <div>
+      F3 Status Report Generator · PM Co-pilot · ISAN 5365 · Dr. Ju Long ·
+      <a href="https://github.com" target="_blank">GitHub</a>
+    </div>
+    <div>Sneha Tulshiram Nitnaware · 2026</div>
+  </footer>
+
+  <!-- ── Toast notification ─────────────────────────────────────────── -->
+  <div class="toast" id="toast"></div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
